@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Join Chat Room</h1>
+
+<input
+    id="username"
+    placeholder="Username"
+>
+
+<input
+    id="room-name"
+    placeholder="Room Name"
+>
+
+<button onclick="joinRoom()">
+    Join Room
+</button>
+
+<script>
+
+function joinRoom() {
+
+    const username =
+        document.getElementById(
+            "username"
+        ).value;
+
+    const room =
+        document.getElementById(
+            "room-name"
+        ).value;
+
+    window.location.href =
+        `/room/${room}/?username=${username}`;
+}
+
+</script>
+
+</body>
+</html>
