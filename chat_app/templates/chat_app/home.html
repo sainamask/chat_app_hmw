@@ -32,8 +32,14 @@ function joinRoom() {
             "room-name"
         ).value;
 
+    if (!room || !username) {
+        alert("Please enter a username and room name.");
+        return;
+    }
+
     window.location.href =
-        `/room/${room}/?username=${username}`;
+        `/room/${encodeURIComponent(room)}/`
+        + `?username=${encodeURIComponent(username)}`;
 }
 
 </script>

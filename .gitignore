@@ -2,3 +2,5 @@ venv/
 __pycache__/
 *.py[cod]
 db.sqlite3
+HOW_IT_WORKS.md
+how_it_works.html

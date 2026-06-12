@@ -35,10 +35,19 @@ chatSocket.onmessage = function(e){
 
     const data = JSON.parse(e.data);
 
+    const p = document.createElement("p");
+
+    const name = document.createElement("b");
+    name.textContent = data.username + ": ";
+
+    p.appendChild(name);
+    p.appendChild(
+        document.createTextNode(data.message)
+    );
+
     document
         .getElementById("chat-box")
-        .innerHTML +=
-        `<p><b>${data.username}</b>: ${data.message}</p>`;
+        .appendChild(p);
 };
 
 document

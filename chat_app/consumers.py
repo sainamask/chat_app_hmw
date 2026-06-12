@@ -3,6 +3,8 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
+from .models import Room, Message
+
 
 class ChatConsumer(WebsocketConsumer):
 
@@ -21,6 +23,8 @@ class ChatConsumer(WebsocketConsumer):
 
         self.accept()
 
+        self.send_history()
+
     def disconnect(self, close_code):
 
         async_to_sync(
@@ -34,14 +38,22 @@ class ChatConsumer(WebsocketConsumer):
 
         data = json.loads(text_data)
 
+        message = data.get("message", "").strip()
+        username = data.get("username") or "Anonymous"
+
+        if not message:
+            return
+
+        self.save_message(username, message)
+
         async_to_sync(
             self.channel_layer.group_send
         )(
             self.room_group_name,
             {
                 "type": "chat_message",
-                "message": data["message"],
-                "username": data["username"],
+                "message": message,
+                "username": username,
             }
         )
 
@@ -55,3 +67,32 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
         )
+
+    def save_message(self, username, message):
+
+        room, _ = Room.objects.get_or_create(name=self.room_name)
+
+        Message.objects.create(
+            room=room,
+            username=username,
+            content=message,
+        )
+
+    def send_history(self):
+
+        messages = (
+            Message.objects
+            .filter(room__name=self.room_name)
+            .order_by("created_at")
+            .values("username", "content")
+        )
+
+        for msg in messages:
+            self.send(
+                text_data=json.dumps(
+                    {
+                        "message": msg["content"],
+                        "username": msg["username"],
+                    }
+                )
+            )
